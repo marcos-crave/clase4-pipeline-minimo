@@ -72,3 +72,16 @@ jobs:
 
       - name: The image we just built
         run: docker images hola
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Who am I in GCP
+        run: gcloud auth list
+
+      - name: Read something (images in Artifact Registry)
+        run: gcloud artifacts docker images list us-central1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/infra-cloud-template --limit 5
