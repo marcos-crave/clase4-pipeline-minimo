@@ -1,0 +1,22 @@
+# PASO 3: login a GCP por OIDC, sin ninguna clave guardada.
+#
+# 3a. Debajo de "runs-on: ubuntu-latest" (misma sangría que runs-on) pegá:
+
+    permissions:
+      contents: read
+      id-token: write # lets the job ask GitHub for the OIDC token
+
+# 3b. Al final de los steps pegá:
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Who am I in GCP
+        run: gcloud auth list
+
+      - name: Read something (images in Artifact Registry)
+        run: gcloud artifacts docker images list us-central1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/infra-cloud-template --limit 5

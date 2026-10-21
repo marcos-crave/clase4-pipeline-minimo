@@ -1,0 +1,10 @@
+# PASO 4: subir la imagen del paso 2 a Artifact Registry con la identidad del paso 3.
+# Pegá este step al final (necesita el 2 y el 3 arriba).
+
+      - name: docker push to Artifact Registry
+        run: |
+          IMAGE=us-central1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/infra-cloud-template/hola:${GITHUB_SHA::7}
+          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+          docker tag hola:${GITHUB_SHA::7} "$IMAGE"
+          docker push "$IMAGE"
+          echo "::notice::pushed $IMAGE"

@@ -1,0 +1,62 @@
+# The smallest pipeline: on every push GitHub lends us a fresh Ubuntu machine,
+# runs these steps on it and throws it away. Add steps at the end, live.
+name: hola
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  hola:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Which machine did I get
+        run: |
+          cat /etc/os-release | head -2
+          uname -a
+          whoami
+          echo "CPUs: $(nproc)"
+          free -h | head -2
+          df -h / | tail -1
+
+      - name: What it already has installed
+        run: |
+          docker --version
+          python3 --version
+          git --version
+          gcloud --version | head -1
+
+      - name: Our code is NOT there until we check it out
+        run: ls -la
+
+      - uses: actions/checkout@v4
+
+      - name: Now it is
+        run: |
+          ls -la
+          cat saludo.txt
+
+      - name: Run our own code
+        run: python3 hola.py
+
+      - name: Who runs this, and on what
+        run: |
+          echo "Repo:     $GITHUB_REPOSITORY"
+          echo "Lo lanzó: $GITHUB_ACTOR"
+          echo "Evento:   $GITHUB_EVENT_NAME"
+          echo "Commit:   ${GITHUB_SHA::7}"
+          echo "Run:      $GITHUB_RUN_NUMBER"
+          echo "Runner:   $RUNNER_OS $RUNNER_ARCH"
+
+      # A variable is printed as is; a secret, never: GitHub masks it with ***.
+      - name: Repository variable and secret
+        env:
+          SALUDO: ${{ vars.SALUDO }}
+          CLAVE: ${{ secrets.CLAVE_DE_PRUEBA }}
+        run: |
+          echo "Variable SALUDO: $SALUDO"
+          echo "Secret CLAVE_DE_PRUEBA: $CLAVE"
+          echo "El secret tiene ${#CLAVE} caracteres"
+
+      # Add new steps below this line.

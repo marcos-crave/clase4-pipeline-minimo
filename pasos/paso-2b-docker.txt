@@ -1,0 +1,12 @@
+# PASO 2b: pegá estos steps al final de .github/workflows/hola.yml
+# (abajo de "# Add new steps below this line.", con la misma sangría).
+# El runner ya trae Docker: build y run, igual que en la laptop.
+
+      - name: docker build (the same command as on the laptop)
+        run: docker build -t hola:${GITHUB_SHA::7} .
+
+      - name: docker run (now hola.py runs inside a container)
+        run: docker run --rm -e GITHUB_ACTOR -e GITHUB_EVENT_NAME hola:${GITHUB_SHA::7}
+
+      - name: The image we just built
+        run: docker images hola

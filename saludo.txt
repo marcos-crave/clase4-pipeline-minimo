@@ -1,0 +1,1 @@
+Hola desde el repo: este archivo vive en GitHub y llega a la máquina del pipeline con el checkout.
