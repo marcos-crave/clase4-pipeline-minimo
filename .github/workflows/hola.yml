@@ -61,7 +61,7 @@ jobs:
 
       # Add new steps below this line.
 
-            - name: docker build (the same command as on the laptop)
+      - name: docker build (the same command as on the laptop)
         run: docker build -t hola:${GITHUB_SHA::7} .
 
       - name: docker run (now hola.py runs inside a container)
