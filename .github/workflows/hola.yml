@@ -85,3 +85,11 @@ jobs:
 
       - name: Read something (images in Artifact Registry)
         run: gcloud artifacts docker images list us-central1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/infra-cloud-template --limit 5
+
+      - name: docker push to Artifact Registry
+        run: |
+          IMAGE=us-central1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/infra-cloud-template/hola:${GITHUB_SHA::7}
+          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+          docker tag hola:${GITHUB_SHA::7} "$IMAGE"
+          docker push "$IMAGE"
+          echo "::notice::pushed $IMAGE"
