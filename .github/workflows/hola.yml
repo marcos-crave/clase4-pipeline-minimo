@@ -89,8 +89,24 @@ jobs:
 
       - name: docker push to Artifact Registry
         run: |
-          IMAGE=us-central1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/infra-cloud-template/hola:${GITHUB_SHA::7}
+          IMAGE=us-central1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/infra-cloud-template/hola
+          SHA=${GITHUB_SHA::7}
+
+          # Validar el formato del tag semántico
+          if [[ "$GITHUB_REF" == refs/tags/v* ]] && [[ ! "$GITHUB_REF_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Tag inválido. Usar vX.Y.Z"
+            exit 1
+          fi
+
+          # Autenticarse y publicar con el SHA
           gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
-          docker tag hola:${GITHUB_SHA::7} "$IMAGE"
-          docker push "$IMAGE"
-          echo "::notice::pushed $IMAGE"
+          docker tag hola:$SHA "$IMAGE:$SHA"
+          docker push "$IMAGE:$SHA"
+          echo "::notice::pushed $IMAGE:$SHA"
+
+          # Si es una versión semántica, publicar también ese tag
+          if [[ "$GITHUB_REF_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] && [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            docker tag hola:$SHA "$IMAGE:$GITHUB_REF_NAME"
+            docker push "$IMAGE:$GITHUB_REF_NAME"
+            echo "::notice::pushed $IMAGE:$GITHUB_REF_NAME"
+          fi
