@@ -64,7 +64,17 @@ jobs:
           echo "El secret tiene ${#CLAVE} caracteres"
 
       # Add new steps below this line.
+      - name: Configurar Python para el modelo
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
 
+      - name: Test mi-modelo con pytest
+        run: |
+          python -m pip install -r mi-modelo/requirements.txt
+          cd mi-modelo
+          python -m pytest -q tests/
+          
       - name: docker build (the same command as on the laptop)
         run: docker build -t hola:${GITHUB_SHA::7} .
 
