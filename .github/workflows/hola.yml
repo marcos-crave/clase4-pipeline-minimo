@@ -77,6 +77,23 @@ jobs:
 
       - name: Docker build mi-modelo
         run: docker build -t mi-modelo:${GITHUB_SHA::7} ./mi-modelo
+
+      - name: Smoke test mi-modelo /healthz
+        run: |
+          docker run -d --name iris-test -p 8082:8082 mi-modelo:${GITHUB_SHA::7}
+
+          for i in {1..15}; do
+            if curl -fsS http://localhost:8082/healthz; then
+              echo
+              docker stop iris-test
+              exit 0
+            fi
+            sleep 2
+          done
+
+          docker logs iris-test
+          docker stop iris-test
+          exit 1
           
       - name: docker build (the same command as on the laptop)
         run: docker build -t hola:${GITHUB_SHA::7} .
