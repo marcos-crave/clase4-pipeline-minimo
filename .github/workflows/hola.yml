@@ -140,3 +140,13 @@ jobs:
             docker push "$IMAGE:$GITHUB_REF_NAME"
             echo "::notice::pushed $IMAGE:$GITHUB_REF_NAME"
           fi
+
+      - name: Publish mi-modelo to Artifact Registry
+        run: |
+          IMAGE=us-central1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/infra-cloud-template/mi-modelo:${GITHUB_SHA::7}
+
+          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+          docker tag mi-modelo:${GITHUB_SHA::7} "$IMAGE"
+          docker push "$IMAGE"
+
+          echo "::notice::pushed $IMAGE"
