@@ -74,6 +74,9 @@ jobs:
           python -m pip install -r mi-modelo/requirements.txt
           cd mi-modelo
           python -m pytest -q tests/
+
+      - name: Docker build mi-modelo
+        run: docker build -t mi-modelo:${GITHUB_SHA::7} ./mi-modelo
           
       - name: docker build (the same command as on the laptop)
         run: docker build -t hola:${GITHUB_SHA::7} .
